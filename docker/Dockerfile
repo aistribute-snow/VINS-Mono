@@ -29,18 +29,22 @@ RUN   if [ "x$(nproc)" = "x1" ] ; then export USE_PROC=1 ; \
       mkdir -p $CATKIN_WS/src/VINS-Mono/
 
 # Copy VINS-Mono
-COPY ./ $CATKIN_WS/src/VINS-Mono/
+# COPY ./ $CATKIN_WS/src/VINS-Mono/
 # use the following line if you only have this dockerfile
-# RUN git clone https://github.com/HKUST-Aerial-Robotics/VINS-Mono.git
+RUN cd /root/catkin_ws/src/ && git clone https://github.com/aistribute-snow/VINS-Mono.git 
 
+RUN cd /root/catkin_ws/ && \
+       . /opt/ros/${ROS_DISTRO}/setup.sh  &&\
+       catkin_make
+RUN echo "source /root/catkin_ws/devel/setup.bash" >> ~/.bashrc
 # Build VINS-Mono
 WORKDIR $CATKIN_WS
-ENV TERM xterm
-ENV PYTHONIOENCODING UTF-8
-RUN catkin config \
-      --extend /opt/ros/$ROS_DISTRO \
-      --cmake-args \
-        -DCMAKE_BUILD_TYPE=Release && \
-    catkin build && \
-    sed -i '/exec "$@"/i \
-            source "/root/catkin_ws/devel/setup.bash"' /ros_entrypoint.sh
+# ENV TERM xterm
+# ENV PYTHONIOENCODING UTF-8
+# RUN catkin config \
+#       --extend /opt/ros/$ROS_DISTRO \
+#       --cmake-args \
+#         -DCMAKE_BUILD_TYPE=Release && \
+#     catkin build && \
+#     sed -i '/exec "$@"/i \
+#             source "/root/catkin_ws/devel/setup.bash"' /ros_entrypoint.sh
